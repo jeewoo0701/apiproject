@@ -4,10 +4,6 @@ import ProductTable from './components/table/ProductTable.jsx';
 import Pagination from './components/common/Pagination.jsx';
 import './App.css';
 
-// API_KEY 및 BASE_URL을 한 번만 정의
-const API_KEY = import.meta.env.VITE_FRESHFOOD_API_KEY;
-const BASE_URL = `http://openapi.seoul.go.kr:8088/${API_KEY}/json/foodAuctionItemPrice`;
-
 // 등급에 따른 정렬 우선순위
 const gradePriority = {
   '특': 1,
@@ -35,8 +31,8 @@ function App() {
   // 전체 데이터 개수만 가져오는 함수
   const fetchTotalCount = async (productName) => {
     try {
-      const searchParam = productName.trim() ? `/${productName.trim()}` : '';
-      const response = await fetch(`${BASE_URL}/1/1${searchParam}`);
+      const searchParam = productName.trim() ? `&searchTerm=${encodeURIComponent(productName.trim())}` : '';
+      const response = await fetch(`/api/proxy?startIndex=1&endIndex=1${searchParam}`);
       
       if (!response.ok) {
         throw new Error(`API 오류: ${response.statusText}`);
@@ -74,14 +70,14 @@ function App() {
       
       setLoading(true);
       
-      const searchParam = productName.trim() ? `/${productName.trim()}` : '';
+      const searchParam = productName.trim() ? `&searchTerm=${encodeURIComponent(productName.trim())}` : '';
       const startIndex = (page - 1) * itemsPerPage + 1;
       const endIndex = Math.min(page * itemsPerPage, totalCount);
       
       // 필요한 데이터 범위만 요청
       console.log(`데이터 가져오는 중 ${startIndex}~${endIndex}...`);
       
-      const response = await fetch(`${BASE_URL}/${startIndex}/${endIndex}${searchParam}`);
+      const response = await fetch(`/api/proxy?startIndex=${startIndex}&endIndex=${endIndex}${searchParam}`);
       
       if (!response.ok) {
         throw new Error(`API 오류: ${response.statusText}`);
